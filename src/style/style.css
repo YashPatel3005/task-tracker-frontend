@@ -1,0 +1,70 @@
+.container-main {
+  height: 100vh;
+  padding: 90px 0 50px;
+  /* max-width: 1000px; */
+}
+.d-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.tabel-list {
+  margin-top: 20px;
+}
+.empty-table {
+  text-align: center !important;
+}
+.list-head {
+  margin-bottom: 30px;
+}
+.form-detail .MuiFormControl-root {
+  margin: 0 0 20px;
+}
+.select-table-btn {
+  min-width: 10px !important;
+}
+.select-table-btn:hover {
+  color: #5664d2;
+  background: transparent;
+}
+.select-table-btn svg {
+  width: 24px;
+}
+.edite-icon svg {
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.select-table {
+  cursor: pointer;
+}
+.unauth-wrap {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 80vh;
+}
+.unauth-wrap-link {
+  float: right;
+  margin: 10px 0 0;
+  cursor: pointer;
+}
+.unauth-wrap-link span {
+  color: #3f51b5;
+}
+.Toastify__toast-theme--light {
+  background: #3498db !important;
+  color: #fff !important;
+}
+.loading-svg {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.user-avtar {
+  margin: 0 20px;
+}
+.MuiFormHelperText-contained {
+  margin-left: 0 !important;
+}
