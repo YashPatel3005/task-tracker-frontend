@@ -16,3 +16,18 @@ export const delayedAction = ({
 export const removeDoubleQuotes = (string) => {
   return string.replace(/"/g, "");
 };
+
+export class LocalStorage {
+  static setItem(key, value) {
+    return localStorage.setItem(key, value);
+  }
+  static getItem(key) {
+    return localStorage.getItem(key);
+  }
+  static removeItem(key) {
+    return localStorage.removeItem(key);
+  }
+  static clear() {
+    return localStorage.clear();
+  }
+}

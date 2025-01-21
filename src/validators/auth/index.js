@@ -6,7 +6,8 @@ const signupSchema = Joi.object({
     .required()
     .label("Email"),
   password: Joi.string().min(5).max(20).required().label("PassWord"),
-  fullName: Joi.string().min(4).max(20).required().label("Full Name"),
+  lastName: Joi.string().required().label("Last Name"),
+  firstName: Joi.string().required().label("First Name"),
 });
 
 const signInSchema = Joi.object({

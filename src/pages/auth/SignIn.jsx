@@ -5,15 +5,23 @@ import { Controller, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { signInSchema } from "../../validators/auth/index";
 import { joiResolver } from "@hookform/resolvers/joi";
-import { delayedAction, removeDoubleQuotes } from "../../utils/helpers";
+import { removeDoubleQuotes } from "../../utils/helpers";
+import { useAppDispatch, useAppSelector } from "../../store/store";
+import { signInAsyncHandler } from "./auth.slice";
+import { STATUS } from "../../components/common/model/common.model";
+import Loader from "../../components/common/Loader";
 
 function SignIn() {
   const navigate = useNavigate();
-  // const { isError = false, errorMsg } = useSelector(
-  //   (state) => state.authReducer
-  // );
+  const dispatch = useAppDispatch();
 
-  const { handleSubmit, errors, control } = useForm({
+  const { isUserLoggedIn } = useAppSelector((state) => state.auth);
+
+  const {
+    handleSubmit,
+    formState: { errors },
+    control,
+  } = useForm({
     mode: "onTouched",
     shouldFocusError: true,
     reValidateMode: "onChange",
@@ -26,21 +34,13 @@ function SignIn() {
     },
   });
 
-  // const onSignIn = (data) => {
-  //   delayedAction({
-  //     startLoader: () => {
-  //       dispatch(isLoadingTrue());
-  //     },
-  //     onSucces: () => {
-  //       dispatch(isLoadingFalse());
-  //       dispatch(loginUser(data));
-  //     },
-  //     showToast: false,
-  //   });
-  // };
+  const onSignIn = (data) => {
+    dispatch(signInAsyncHandler(data));
+  };
 
   return (
     <Container className="unauth-wrap" component="main" maxWidth="xs">
+      {isUserLoggedIn === STATUS.PENDING && <Loader />}
       <div>
         <Typography
           component="h5"
@@ -53,8 +53,9 @@ function SignIn() {
           <Controller
             control={control}
             name="email"
-            render={({ onChange, value, onBlur }) => (
+            render={({ field, onBlur }) => (
               <TextField
+                {...field}
                 margin="normal"
                 required
                 fullWidth
@@ -66,8 +67,6 @@ function SignIn() {
                 helperText={
                   errors?.email && removeDoubleQuotes(errors?.email.message)
                 }
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
               />
             )}
           />
@@ -75,8 +74,9 @@ function SignIn() {
           <Controller
             control={control}
             name="password"
-            render={({ onChange, value, onBlur }) => (
+            render={({ field, onBlur }) => (
               <TextField
+                {...field}
                 margin="normal"
                 required
                 fullWidth
@@ -90,8 +90,6 @@ function SignIn() {
                   errors?.password &&
                   removeDoubleQuotes(errors?.password.message)
                 }
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
               />
             )}
           />
@@ -104,11 +102,11 @@ function SignIn() {
             size="large"
             variant="contained"
             color="primary"
-            // onClick={handleSubmit(onSignIn)}
+            onClick={handleSubmit(onSignIn)}
           >
             Sign In
           </Button>
-          <div component="h5" variant="h5" className="unauth-wrap-link">
+          <div className="unauth-wrap-link">
             Don't have an account?
             <span onClick={() => navigate("/signup")}> Sign Up</span>
           </div>

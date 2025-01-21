@@ -1,6 +1,7 @@
 import { Container } from "@mui/material";
-import { Header } from "components/header";
 import PropTypes from "prop-types";
+import { Header } from "../components/Header";
+
 function AppLayout({ children }) {
   return (
     <>
