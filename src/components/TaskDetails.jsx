@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { removeDoubleQuotes } from "../utils/helpers";
@@ -12,7 +13,6 @@ import {
   editTaskAsyncHandler,
   getTaskDetailsAsyncHandler,
 } from "../pages/task/task.slice";
-import { useNavigate, useParams } from "react-router-dom";
 import PropTypes from "prop-types";
 
 function TaskDetails({ setAddTask }) {
@@ -76,7 +76,9 @@ function TaskDetails({ setAddTask }) {
       res = await dispatch(addTaskAsyncHandler(data));
     }
     if (res) {
-      setAddTask(false);
+      if (setAddTask) {
+        setAddTask(false);
+      }
       navigate("/home"); // Redirect to the Task List
     }
   };
@@ -165,7 +167,9 @@ function TaskDetails({ setAddTask }) {
             const res = await dispatch(deleteTaskAsyncHandler({ id: editId }));
             if (res) {
               navigate("/home");
-              setAddTask(false);
+              if (setAddTask) {
+                setAddTask(false);
+              }
             }
           }}
           isOpen={deleteModal}
