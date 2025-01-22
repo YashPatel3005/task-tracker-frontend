@@ -8,7 +8,6 @@ function Auth() {
       <Route path="/" element={<SignIn />} />
       <Route path="/signup" element={<SignUp />} />
       <Route path="*" element={<Navigate to="/" replace />} />
-      {/* <Navigate to="/" /> */}
     </Routes>
   );
 }

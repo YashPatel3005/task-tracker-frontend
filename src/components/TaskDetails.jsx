@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import PropTypes from "prop-types";
+import React, { useEffect, useState } from "react";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
 import { removeDoubleQuotes } from "../utils/helpers";
@@ -7,20 +6,30 @@ import { ConformationModal } from "./ConformationModal";
 import { joiResolver } from "@hookform/resolvers/joi";
 import Joi from "joi";
 import { useAppDispatch, useAppSelector } from "../store/store";
-import { STATUS } from "./common/model/common.model";
-import Loader from "./common/Loader";
-import { addTaskAsyncHandler } from "../pages/task/task.slice";
+import {
+  addTaskAsyncHandler,
+  deleteTaskAsyncHandler,
+  editTaskAsyncHandler,
+  getTaskDetailsAsyncHandler,
+} from "../pages/task/task.slice";
 import { useNavigate, useParams } from "react-router-dom";
+import PropTypes from "prop-types";
 
-function TaskDetails({ setAddDoc }) {
+function TaskDetails({ setAddTask }) {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { id: editId } = useParams();
   const [deleteModal, setDeleteModal] = useState(false);
 
-  const { isTaskCreate } = useAppSelector((state) => state.task);
+  const { isCreatedLoading, taskDetailData } = useAppSelector(
+    (state) => state.task
+  );
 
-  // const { singleDocument = {} } = useSelector((state) => state.documentReducer);
+  useEffect(() => {
+    if (editId) {
+      dispatch(getTaskDetailsAsyncHandler({ id: editId }));
+    }
+  }, [editId]);
 
   const {
     handleSubmit,
@@ -50,79 +59,30 @@ function TaskDetails({ setAddDoc }) {
     },
   });
 
-  // useEffect(() => {
-  //   if (singleDocument?.id) {
-  //     reset({
-  //       title: singleDocument.title,
-  //       description: singleDocument.description,
-  //     });
-  //   }
-  // }, [singleDocument, reset]);
-
-  // useEffect(() => {
-  //   if (editId) {
-  //     return () => {
-  //       dispatch(clearSingleDocument());
-  //     };
-  //   }
-  // }, [dispatch, editId]);
-  // const submitForm = (data) => {
-  //   if (editId) {
-  //     const payload = {
-  //       ...data,
-  //       id: editId,
-  //       isEdited: true,
-  //     };
-
-  //     delayedAction({
-  //       startLoader: () => {
-  //         dispatch(isLoadingTrue());
-  //         history.push("/home");
-  //       },
-  //       onSucces: () => {
-  //         dispatch(isLoadingFalse());
-  //         dispatch(updateDocument(payload));
-  //       },
-  //       setToast: "Document Update",
-  //     });
-  //     return;
-  //   }
-
-  //   if (!editId) {
-  //     const payload = {
-  //       ...data,
-  //       id: uuidv4(),
-  //       isEdited: false,
-  //     };
-
-  //     delayedAction({
-  //       startLoader: () => {
-  //         dispatch(isLoadingTrue());
-  //       },
-  //       onSucces: () => {
-  //         setAddDoc(false);
-  //         dispatch(isLoadingFalse());
-  //         dispatch(addDocument(payload));
-  //       },
-  //       setToast: "Document Added",
-  //     });
-  //     return;
-  //   }
-  // };
+  useEffect(() => {
+    if (taskDetailData) {
+      reset({
+        title: taskDetailData?.title ?? "",
+        description: taskDetailData?.description ?? "",
+      });
+    }
+  }, [taskDetailData, reset, editId]);
 
   const submitForm = async (data) => {
-    const res = await dispatch(addTaskAsyncHandler(data));
-    console.log(res);
-
+    let res;
+    if (editId) {
+      res = await dispatch(editTaskAsyncHandler({ id: editId, payload: data }));
+    } else {
+      res = await dispatch(addTaskAsyncHandler(data));
+    }
     if (res) {
-      // navigate("/home");
-      setAddDoc(false);
+      setAddTask(false);
+      navigate("/home"); // Redirect to the Task List
     }
   };
 
   return (
     <>
-      {isTaskCreate === STATUS.PENDING && <Loader />}
       <Box className="d-flex list-head">
         <Typography variant="h6" component="div">
           {editId ? "Update" : "Add"} Task
@@ -140,7 +100,7 @@ function TaskDetails({ setAddDoc }) {
               if (editId) {
                 navigate("/home");
               } else {
-                setAddDoc(false);
+                setAddTask(false);
               }
             }}
           >
@@ -150,6 +110,8 @@ function TaskDetails({ setAddDoc }) {
             color="primary"
             variant="contained"
             onClick={handleSubmit(submitForm)}
+            loading={isCreatedLoading}
+            disabled={isCreatedLoading}
           >
             {editId ? "Update" : "Add"} Task
           </Button>
@@ -199,19 +161,12 @@ function TaskDetails({ setAddDoc }) {
       </form>
       {deleteModal && (
         <ConformationModal
-          onClickYes={() => {
-            // delayedAction({
-            //   startLoader: () => {
-            //     dispatch(isLoadingTrue());
-            //     setDeleteModal(false);
-            //     history.push("/home");
-            //   },
-            //   onSucces: () => {
-            //     dispatch(isLoadingFalse());
-            //     dispatch(deleteDocument(editId));
-            //   },
-            //   setToast: "Document Deleted",
-            // });
+          onClickYes={async () => {
+            const res = await dispatch(deleteTaskAsyncHandler({ id: editId }));
+            if (res) {
+              navigate("/home");
+              setAddTask(false);
+            }
           }}
           isOpen={deleteModal}
           modalHeader="Are you sure you want to Delete Task"
@@ -222,8 +177,8 @@ function TaskDetails({ setAddDoc }) {
   );
 }
 
-TaskDetails.prototype = {
-  setAddDoc: PropTypes.func.isRequired,
+TaskDetails.prototypes = {
+  setAddTask: PropTypes.func.isRequired,
 };
 
 export default TaskDetails;

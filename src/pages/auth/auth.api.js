@@ -18,3 +18,14 @@ export const signIn = async (payload) => {
   });
   return res.data;
 };
+
+export const logout = async () => {
+  const res = await axiosInstance({
+    method: "post",
+    url: API_ROUTES.LOG_OUT,
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  });
+  return res.data;
+};

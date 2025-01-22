@@ -17,8 +17,8 @@ createRoot(document.getElementById("root")).render(
         <CssBaseline />
         <App />
         <ToastContainer
-          position="bottom-left"
-          autoClose={5000}
+          position="top-right"
+          autoClose={3000}
           hideProgressBar
           newestOnTop
           closeOnClick

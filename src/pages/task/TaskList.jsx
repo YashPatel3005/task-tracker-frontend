@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -10,44 +11,47 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  TableSortLabel,
   Tooltip,
   Typography,
-  Zoom,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
 import { ConformationModal } from "../../components/ConformationModal";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import TaskDetails from "../../components/TaskDetails";
 import { useAppDispatch, useAppSelector } from "../../store/store";
-import { getAllTasksAsyncHandler } from "./task.slice";
-import { STATUS } from "../../components/common/model/common.model";
+import { deleteTaskAsyncHandler, getAllTasksAsyncHandler } from "./task.slice";
 import Loader from "../../components/common/Loader";
+import { useNavigate } from "react-router-dom";
+import moment from "moment/moment";
 
 function TaskList() {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
-  const { isTaskFetch, tasks = [] } = useAppSelector((state) => state.task);
-  console.log(tasks);
+  const { isFetching, tasks } = useAppSelector((state) => state.task);
 
-  const [addDoc, setAddDoc] = useState(false);
+  const [addTask, setAddTask] = useState(false);
+  const [editTask, setEditTask] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(2);
-  const [titleSortingtype, setTitleingtype] = useState(null);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   useEffect(() => {
-    dispatch(getAllTasksAsyncHandler());
-  }, []);
+    if (!addTask) {
+      dispatch(getAllTasksAsyncHandler({ page: page + 1, limit: rowsPerPage }));
+    }
+  }, [addTask, dispatch, page, rowsPerPage]);
 
-  if (addDoc) {
-    return <TaskDetails {...{ setAddDoc }} />;
+  if (addTask) {
+    return <TaskDetails setAddTask={setAddTask} />;
+  }
+
+  if (editTask) {
+    return <TaskDetails setAddTask={setEditTask} />;
   }
 
   const getTableData = () => {
-    if (tasks.length === 0) {
+    if (tasks?.tasks?.length === 0) {
       return (
         <TableRow hover>
           <TableCell className="empty-table" colSpan="4">
@@ -56,62 +60,74 @@ function TaskList() {
         </TableRow>
       );
     }
-    return (
-      rowsPerPage > 0
-        ? tasks.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-        : tasks
-    ).map(({ id, title, description, isEdited }, index) => (
-      <TableRow
-        hover
-        key={id}
-        onClick={() => {
-          history.push(`/home/${id}`);
-          //   dispatch(getSingleDocument(id));
-        }}
-      >
-        <TableCell className="pl-4">{index + 1 + page * rowsPerPage}</TableCell>
-        <TableCell className="edite-icon">
-          {title}
-          {isEdited && (
-            <Tooltip
-              TransitionComponent={Zoom}
-              title="Edited Task"
-              placement="top"
+    return (tasks?.tasks ?? []).map(
+      ({ _id, title, description, priority, status, createdAt }, index) => (
+        <TableRow
+          hover
+          key={_id}
+          onClick={() => {
+            navigate(`/home/${_id}`);
+            setEditTask(true);
+            // <TaskDetails setAddTask={setAddTask} />;
+          }}
+        >
+          <TableCell className="pl-4">
+            {index + 1 + page * rowsPerPage}
+          </TableCell>
+          <TableCell className="edite-icon">
+            {title}
+            {/* {editTask && (
+              <Tooltip
+               
+                title="Edited Task"
+                placement="top"
+              >
+                <EditOutlinedIcon fontSize="small" />
+              </Tooltip>
+            )} */}
+          </TableCell>
+          <Tooltip placement="top">
+            <TableCell>{description}</TableCell>
+          </Tooltip>
+          {/* <Tooltip placement="top">
+            <TableCell>{TASK_PRIORITY[priority]}</TableCell>
+          </Tooltip>
+          <Tooltip placement="top">
+            <TableCell>{TASK_STATUS[status]}</TableCell>
+          </Tooltip> */}
+          <Tooltip placement="top">
+            <TableCell>
+              {moment(createdAt, "x").format("MM/DD/YYYY HH:MM:SS a")}
+            </TableCell>
+          </Tooltip>
+          <TableCell>
+            <Button
+              className="select-table-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                setEditId(_id);
+                setDeleteModal(true);
+              }}
             >
-              <EditOutlinedIcon fontSize="small" />
-            </Tooltip>
-          )}
-        </TableCell>
-        <Tooltip TransitionComponent={Zoom} title={description} placement="top">
-          <TableCell>{description}</TableCell>
-        </Tooltip>
-        <TableCell>
-          <Button
-            className="select-table-btn"
-            onClick={(e) => {
-              e.stopPropagation();
-              setEditId(id);
-              setDeleteModal(true);
-            }}
-          >
-            <DeleteOutlinedIcon />
-          </Button>
-        </TableCell>
-      </TableRow>
-    ));
+              <DeleteOutlinedIcon />
+            </Button>
+          </TableCell>
+        </TableRow>
+      )
+    );
   };
   return (
     <>
-      {isTaskFetch === STATUS.PENDING && <Loader />}
+      {isFetching && <Loader />}
       <Box className="d-flex">
         <Typography variant="h6" component="div">
-          Task List <span>({tasks.length})</span>
+          Task List <span>({tasks?.tasks?.length})</span>
         </Typography>
 
         <Button
           color="primary"
           variant="contained"
-          onClick={() => setAddDoc(true)}
+          onClick={() => setAddTask(true)}
         >
           Add Task
         </Button>
@@ -124,7 +140,7 @@ function TaskList() {
                 <TableRow>
                   <TableCell className="pl-4">#</TableCell>
                   <TableCell sortDirection={false}>
-                    <TableSortLabel
+                    {/* <TableSortLabel
                       active={
                         titleSortingtype === "asc" ||
                         titleSortingtype === "desc"
@@ -141,13 +157,16 @@ function TaskList() {
                           // dispatch(titleSortDesc());
                         }
                       }}
-                    >
-                      Title
-                    </TableSortLabel>
+                    > */}
+                    Title
+                    {/* </TableSortLabel> */}
                   </TableCell>
 
                   <TableCell>Description</TableCell>
-                  <TableCell>Delete</TableCell>
+                  {/* <TableCell>Priority</TableCell>
+                  <TableCell>Status</TableCell> */}
+                  <TableCell>Created Date</TableCell>
+                  <TableCell>Action</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>{getTableData()}</TableBody>
@@ -156,7 +175,7 @@ function TaskList() {
           <TablePagination
             rowsPerPageOptions={[2, 5, 10, 20]}
             component="div"
-            count={tasks.length}
+            count={tasks?.total || 0}
             page={page}
             onPageChange={(e, newPage) => setPage(newPage)}
             rowsPerPage={rowsPerPage}
@@ -170,21 +189,15 @@ function TaskList() {
       {deleteModal && (
         <ConformationModal
           onClickYes={() => {
-            // delayedAction({
-            //   startLoader: () => {
-            //     dispatch(isLoadingTrue());
-            //   },
-            //   onSucces: () => {
-            //     dispatch(isLoadingFalse());
-            //     dispatch(deleteDocument(editId));
-            //     setDeleteModal(false);
-            //     setEditId(null);
-            //   },
-            //   setToast: "Document Deleted",
-            // });
+            dispatch(deleteTaskAsyncHandler({ id: editId }));
+            setDeleteModal(false);
+            setEditId(null);
+            dispatch(
+              getAllTasksAsyncHandler({ page: page + 1, limit: rowsPerPage })
+            );
           }}
           isOpen={deleteModal}
-          modalHeader="Are you sure you want to Delete Document"
+          modalHeader="Are you sure you want to Delete Task"
           onClose={() => {
             setDeleteModal(false);
             setEditId(null);

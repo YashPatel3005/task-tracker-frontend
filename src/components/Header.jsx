@@ -10,15 +10,17 @@ import {
   Typography,
 } from "@mui/material";
 import { LocalStorage } from "../utils/helpers";
+import { useAppDispatch } from "../store/store";
+import { logoutAsyncHandler } from "../pages/auth/auth.slice";
 
 function Header() {
+  const dispatch = useAppDispatch();
   const sessionData = JSON.parse(LocalStorage.getItem("UserSession") ?? "");
 
   const [logoutModal, setLogoutModal] = useState(false);
 
   const handleLogout = () => {
-    LocalStorage.removeItem("UserSession");
-    window.location.href = "/";
+    dispatch(logoutAsyncHandler());
   };
 
   return (
@@ -29,9 +31,9 @@ function Header() {
             Task Tracker
           </Typography>
           <div className="d-flex">
-            <span>{sessionData?.userData?.email ?? ""}</span>
+            <span>{sessionData?.userdata?.email ?? ""}</span>
             <Avatar className="user-avtar">
-              {(sessionData?.userData?.email ?? "")?.substring(0, 1) || "t"}
+              {(sessionData?.userdata?.email ?? "")?.substring(0, 1) || "t"}
             </Avatar>
 
             <Button color="inherit" onClick={() => setLogoutModal(true)}>

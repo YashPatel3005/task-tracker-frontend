@@ -8,14 +8,12 @@ import { joiResolver } from "@hookform/resolvers/joi";
 import { removeDoubleQuotes } from "../../utils/helpers";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { signInAsyncHandler } from "./auth.slice";
-import { STATUS } from "../../components/common/model/common.model";
-import Loader from "../../components/common/Loader";
 
 function SignIn() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const { isUserLoggedIn } = useAppSelector((state) => state.auth);
+  const { loading } = useAppSelector((state) => state.auth);
 
   const {
     handleSubmit,
@@ -40,7 +38,6 @@ function SignIn() {
 
   return (
     <Container className="unauth-wrap" component="main" maxWidth="xs">
-      {isUserLoggedIn === STATUS.PENDING && <Loader />}
       <div>
         <Typography
           component="h5"
@@ -93,7 +90,6 @@ function SignIn() {
               />
             )}
           />
-          {/* {isError && <p>{errorMsg}</p>} */}
 
           <Button
             style={{ marginTop: "10px" }}
@@ -102,6 +98,8 @@ function SignIn() {
             size="large"
             variant="contained"
             color="primary"
+            disabled={loading}
+            loading={loading}
             onClick={handleSubmit(onSignIn)}
           >
             Sign In

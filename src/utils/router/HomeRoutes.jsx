@@ -24,7 +24,6 @@ function Home() {
           </AppLayout>
         }
       />
-      {/* <Navigate to="/home" /> */}
       <Route path="*" element={<Navigate to="/home" replace />} />
     </Routes>
   );

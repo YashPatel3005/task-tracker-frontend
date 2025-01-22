@@ -5,31 +5,16 @@ import { Controller, useForm } from "react-hook-form";
 import { Button, Container, TextField, Typography } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { signUpAsyncHandler } from "./auth.slice";
-import { useState } from "react";
-import { STATUS } from "../../components/common/model/common.model";
-import Loader from "../../components/common/Loader";
 import { removeDoubleQuotes } from "../../utils/helpers";
 
 function SignUp() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const { isUserLoggedIn } = useAppSelector((state) => state.auth);
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { loading } = useAppSelector((state) => state.auth);
 
   const onSignup = (data) => {
-    if (isSubmitting) return; // Avoid multiple submissions
-
-    setIsSubmitting(true); // Mark as submitting
-
-    dispatch(signUpAsyncHandler(data))
-      .then(() => {
-        setIsSubmitting(false); // Reset after the request is completed
-      })
-      .catch(() => {
-        setIsSubmitting(false); // Reset in case of error
-      });
+    dispatch(signUpAsyncHandler(data));
   };
 
   const {
@@ -50,10 +35,6 @@ function SignUp() {
       password: "",
     },
   });
-
-  if (isUserLoggedIn === STATUS.PENDING) {
-    return <Loader />;
-  }
 
   return (
     <Container className="unauth-wrap" component="main" maxWidth="xs">
@@ -153,7 +134,8 @@ function SignUp() {
             size="large"
             variant="contained"
             color="primary"
-            disabled={isSubmitting}
+            disabled={loading}
+            loading={loading}
             onClick={handleSubmit(onSignup)}
           >
             Sign Up
