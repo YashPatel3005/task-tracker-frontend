@@ -37,6 +37,7 @@ function TaskList() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [createdDateSorting, setCreatedDateSorting] = useState(null);
+  const [titleSortingType, setTitleSortingtype] = useState(null);
 
   useEffect(() => {
     if (!addTask) {
@@ -142,26 +143,38 @@ function TaskList() {
                 <TableRow>
                   <TableCell className="pl-4">#</TableCell>
                   <TableCell sortDirection={false}>
-                    {/* <TableSortLabel
+                    <TableSortLabel
                       active={
-                        titleSortingtype === "asc" ||
-                        titleSortingtype === "desc"
+                        titleSortingType === "asc" ||
+                        titleSortingType === "desc"
                       }
-                      direction={titleSortingtype === "asc" ? "desc" : "asc"}
+                      direction={titleSortingType === "asc" ? "desc" : "asc"}
                       onClick={() => {
-                        setTitleingtype(
-                          titleSortingtype === "asc" ? "desc" : "asc"
+                        setTitleSortingtype(
+                          titleSortingType === "asc" ? "desc" : "asc"
                         );
-                        if (titleSortingtype === "asc") {
-                          // dispatch(titleSortAsc());
+                        if (titleSortingType === "asc") {
+                          dispatch(
+                            getAllTasksAsyncHandler({
+                              page: page + 1,
+                              limit: rowsPerPage,
+                              sortBy: `createdAt:${titleSortingType}`,
+                            })
+                          );
                         }
-                        if (titleSortingtype === "desc") {
-                          // dispatch(titleSortDesc());
+                        if (titleSortingType === "desc") {
+                          dispatch(
+                            getAllTasksAsyncHandler({
+                              page: page + 1,
+                              limit: rowsPerPage,
+                              sortBy: `createdAt:${titleSortingType}`,
+                            })
+                          );
                         }
                       }}
-                    > */}
-                    Title
-                    {/* </TableSortLabel> */}
+                    >
+                      Title
+                    </TableSortLabel>
                   </TableCell>
 
                   <TableCell>Description</TableCell>
