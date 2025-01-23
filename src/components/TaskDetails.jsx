@@ -25,12 +25,6 @@ function TaskDetails({ setAddTask }) {
     (state) => state.task
   );
 
-  useEffect(() => {
-    if (editId) {
-      dispatch(getTaskDetailsAsyncHandler({ id: editId }));
-    }
-  }, [editId]);
-
   const {
     handleSubmit,
     formState: { errors },
@@ -60,13 +54,17 @@ function TaskDetails({ setAddTask }) {
   });
 
   useEffect(() => {
-    if (taskDetailData) {
+    if (editId) {
+      dispatch(getTaskDetailsAsyncHandler({ id: editId }));
       reset({
         title: taskDetailData?.title ?? "",
         description: taskDetailData?.description ?? "",
       });
+    } else {
+      // Reset form when component mounts for adding a new task
+      reset({ title: "", description: "" });
     }
-  }, [taskDetailData, reset, editId]);
+  }, [editId, dispatch, reset, taskDetailData]);
 
   const submitForm = async (data) => {
     let res;
@@ -76,6 +74,7 @@ function TaskDetails({ setAddTask }) {
       res = await dispatch(addTaskAsyncHandler(data));
     }
     if (res) {
+      reset({ title: "", description: "" }); // Reset form after successful submission
       if (setAddTask) {
         setAddTask(false);
       }
@@ -99,6 +98,7 @@ function TaskDetails({ setAddTask }) {
             style={{ margin: "0 20px" }}
             variant="outlined"
             onClick={() => {
+              reset({ title: "", description: "" });
               if (editId) {
                 navigate("/home");
               } else {
@@ -166,6 +166,7 @@ function TaskDetails({ setAddTask }) {
           onClickYes={async () => {
             const res = await dispatch(deleteTaskAsyncHandler({ id: editId }));
             if (res) {
+              reset({ title: "", description: "" });
               navigate("/home");
               if (setAddTask) {
                 setAddTask(false);
