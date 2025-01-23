@@ -11,6 +11,7 @@ import {
   TableHead,
   TablePagination,
   TableRow,
+  TableSortLabel,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -35,6 +36,7 @@ function TaskList() {
   const [editId, setEditId] = useState(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [createdDateSorting, setCreatedDateSorting] = useState(null);
 
   useEffect(() => {
     if (!addTask) {
@@ -165,7 +167,40 @@ function TaskList() {
                   <TableCell>Description</TableCell>
                   {/* <TableCell>Priority</TableCell>
                   <TableCell>Status</TableCell> */}
-                  <TableCell>Created Date</TableCell>
+                  <TableCell>
+                    <TableSortLabel
+                      active={
+                        createdDateSorting === "asc" ||
+                        createdDateSorting === "desc"
+                      }
+                      direction={createdDateSorting === "asc" ? "desc" : "asc"}
+                      onClick={() => {
+                        setCreatedDateSorting(
+                          createdDateSorting === "asc" ? "desc" : "asc"
+                        );
+                        if (createdDateSorting === "asc") {
+                          dispatch(
+                            getAllTasksAsyncHandler({
+                              page: page + 1,
+                              limit: rowsPerPage,
+                              sortBy: `createdAt:${createdDateSorting}`,
+                            })
+                          );
+                        }
+                        if (createdDateSorting === "desc") {
+                          dispatch(
+                            getAllTasksAsyncHandler({
+                              page: page + 1,
+                              limit: rowsPerPage,
+                              sortBy: `createdAt:${createdDateSorting}`,
+                            })
+                          );
+                        }
+                      }}
+                    >
+                      Created Date
+                    </TableSortLabel>
+                  </TableCell>
                   <TableCell>Action</TableCell>
                 </TableRow>
               </TableHead>

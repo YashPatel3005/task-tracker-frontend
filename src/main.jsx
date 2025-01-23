@@ -10,7 +10,6 @@ import { Provider } from "react-redux";
 import store from "./store/store.js";
 
 createRoot(document.getElementById("root")).render(
-  // <StrictMode>
   <Provider store={store}>
     <ThemeProvider theme={theme}>
       <BrowserRouter>
@@ -29,5 +28,4 @@ createRoot(document.getElementById("root")).render(
       </BrowserRouter>
     </ThemeProvider>
   </Provider>
-  // </StrictMode>
 );
