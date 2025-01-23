@@ -1,8 +1,10 @@
-# React + Vite
+Task Tracker Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is a frontend application for a task tracking system, built using React and Redux Toolkit. The application is designed to interact with a backend API for managing tasks.
 
-Currently, two official plugins are available:
+Getting Started
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+To get started with this project, follow these steps:
+1. Clone the repository or download the template files.
+2. Install the required dependencies by running npm install or yarn install.
+3. Start the development server by running npm run dev or yarn dev.
